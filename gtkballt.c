@@ -167,12 +167,19 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
                 pause = TRUE;
             }
             break;
+       case 110: //'n' new game
+            on_start();
+            break;
+       case 113: //'q' quit game
+            gtk_main_quit ();
+            break;
+            
     }
 }
 
 
 //開始，初始化遊戲
-void on_start(GtkMenuItem *item,gpointer p)
+void on_start()
 {
     g_print ("\n ************\n *  start!  *\n ************\n\n");
     gtk_widget_hide (table);
