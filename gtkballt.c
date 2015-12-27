@@ -130,14 +130,11 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
             {
                 g_source_remove(timeout_id);
                 timeout_id = g_timeout_add(speed-=20, (GSourceFunc) time_handler, (gpointer) window);
-                board_move += 10;
             }
             break;
         case 65364: //方向鍵 ↓
             g_source_remove(timeout_id);
             timeout_id = g_timeout_add(speed+=20, (GSourceFunc) time_handler, (gpointer) window);
-            if(board_move >10)
-                board_move -= 10;
             break;
         case 44:   //','
             if(ballcount > 1)
