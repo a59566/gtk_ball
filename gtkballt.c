@@ -2,14 +2,16 @@
 #include <gtk/gtk.h>
 #include <math.h>
 #include <time.h>
-#define ballcount 3
+#define max_balls 3
+
+int ballcount = 1;
 
 int i;
-int ball_x[ballcount] = {0};           //球圓心初始x座標
-int ball_y[ballcount] = {0};           //球圓心初始y座標
-int r[ballcount] = {0};                //球半徑
-int x_vec[ballcount] = {0};            //球移動x向量
-int y_vec[ballcount] = {0};            //球移動y向量
+int ball_x[max_balls] = {0};           //球圓心初始x座標
+int ball_y[max_balls] = {0};           //球圓心初始y座標
+int r[max_balls] = {0};                //球半徑
+int x_vec[max_balls] = {0};            //球移動x向量
+int y_vec[max_balls] = {0};            //球移動y向量
 
 int board_x = 0;           //板子左上x座標
 int board_y = 280;         //板子左上y座標
@@ -98,31 +100,39 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
 {
     switch(eventkey->keyval)
     {
-    case 65361: //方向鍵 <-
-        if( board_x - board_move >= 0 )
-            board_x -= board_move;
-        else
-            board_x = 0;
-        break;
-    case 65363: //方向键 ->
-        if( board_x + board_width + board_move <= windows_weight)
-            board_x += board_move;
-        else
-            board_x = windows_weight - board_width;
-        break;
-    case 65362: //方向鍵 ↑    
-        if(speed > 20)
-        {
+        case 65361: //方向鍵 <-
+            if( board_x - board_move >= 0 )
+                board_x -= board_move;
+            else
+                board_x = 0;
+            break;
+        case 65363: //方向键 ->
+            if( board_x + board_width + board_move <= windows_weight)
+                board_x += board_move;
+            else
+                board_x = windows_weight - board_width;
+            break;
+        case 65362: //方向鍵 ↑    
+            if(speed > 20)
+            {
+                g_source_remove(timeout_id);
+                timeout_id = g_timeout_add(speed-=20, (GSourceFunc) time_handler, (gpointer) window);
+                board_move += 10;  
+            }   
+            break;
+        case 65364: //方向鍵 ↓
             g_source_remove(timeout_id);
-            timeout_id = g_timeout_add(speed-=20, (GSourceFunc) time_handler, (gpointer) window);
-            board_move += 10;  
-        }   
-        break;
-    case 65364: //方向鍵 ↓
-        g_source_remove(timeout_id);
-        timeout_id = g_timeout_add(speed+=20, (GSourceFunc) time_handler, (gpointer) window);
-        board_move -= 10;
-        break;
+            timeout_id = g_timeout_add(speed+=20, (GSourceFunc) time_handler, (gpointer) window);
+            board_move -= 10;
+            break;
+        case 44:   //','
+            if(ballcount > 1)
+            ballcount--;
+            break;
+        case 46:   //'.'
+            if(ballcount < max_balls)
+            ballcount++;
+            break;
     }
 }
 
