@@ -66,16 +66,35 @@ void move_ball()
     {
         //到左邊界
         if( ball_x[i] - r[i] <= 0 )
-            x_vec[i] = -x_vec[i]+(rand()%5-2);
+        {
+             x_vec[i] = -x_vec[i]+(rand()%5-2);
+             ball_x[i] += x_vec[i]/2;
+             ball_y[i] += y_vec[i]/2;
+        }
         //到右邊界
         if( ball_x[i] + r[i] >= windows_weight )
+        {
             x_vec[i] = -x_vec[i]+(rand()%5-2);
+            ball_x[i] += x_vec[i]/2;
+            ball_y[i] += y_vec[i]/2;
+        }
+            
         //到上邊界
         if( ball_y[i] - r[i] <= 20)
+        {
             y_vec[i] = -y_vec[i]+(rand()%5-2);
+            ball_x[i] += x_vec[i]/2;
+            ball_y[i] += y_vec[i]/2;
+        }
+            
         //到下邊界
         if( ball_y[i] + r[i] >= windows_height)
+        {
             y_vec[i] = -y_vec[i]+(rand()%5-2);
+            ball_x[i] += x_vec[i]/2;
+            ball_y[i] += y_vec[i]/2;
+        }
+            
 
         //板子上
         if( (ball_x[i] >= board_x) && (ball_x[i] <= board_x + board_width) )
