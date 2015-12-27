@@ -137,7 +137,7 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
             timeout_id = g_timeout_add(speed+=20, (GSourceFunc) time_handler, (gpointer) window);
             break;
         case 44:   //','
-            if(ballcount > 1)
+            if(ballcount > 5)
                 ballcount--;
             break;
         case 46:   //'.'
