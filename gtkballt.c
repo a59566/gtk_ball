@@ -25,6 +25,10 @@ int speed = 100;
 int board_move = 10;
 gint timeout_id;
 int game_over = TRUE;      //是否結束
+int pause = FALSE;
+int speed_temp; 
+int board_move_temp;
+
 
 //繪製球
 void draw_ball(cairo_t *cr)
@@ -123,15 +127,29 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
         case 65364: //方向鍵 ↓
             g_source_remove(timeout_id);
             timeout_id = g_timeout_add(speed+=20, (GSourceFunc) time_handler, (gpointer) window);
-            board_move -= 10;
+            if(board_move >10)
+                board_move -= 10;
             break;
         case 44:   //','
             if(ballcount > 1)
-            ballcount--;
+                ballcount--;
             break;
         case 46:   //'.'
             if(ballcount < max_balls)
-            ballcount++;
+                ballcount++;
+            break;
+        case 112:  //'p' 暫停控制
+            if(pause)   //暫停取消
+            {         
+                g_source_remove(timeout_id);
+                timeout_id = g_timeout_add(speed, (GSourceFunc) time_handler, (gpointer) window);
+                pause = FALSE;
+            }
+            else    //暫停
+            {              
+                g_source_remove(timeout_id);
+                pause = TRUE;
+            }
             break;
     }
 }
@@ -154,14 +172,10 @@ void on_start(GtkMenuItem *item,gpointer p)
     board_y = 280;         //板子左上y座標
     board_width = 20;      //板子寬度
     board_height = 20;     //板子厚度
-
+    
+    speed = 100;
+    
     game_over = FALSE;
-}
-
-//结束
-void on_end(GtkMenuItem *item,gpointer p)
-{
-    game_over = TRUE;
 }
 
 
@@ -191,7 +205,6 @@ int main(int argc,char **argv)
     GtkWidget *menubar;
     GtkWidget *game;
     GtkWidget *start;
-    GtkWidget *end;
     GtkWidget *quit;
     GtkWidget *vbox;
     //建立vbox，把他加入容器內
@@ -204,21 +217,17 @@ int main(int argc,char **argv)
     //建立選單選項
     game = gtk_menu_item_new_with_label("Game");
     start = gtk_menu_item_new_with_label("Start");
-    end = gtk_menu_item_new_with_label("End");
     quit = gtk_menu_item_new_with_label("Quit");
 
     gtk_menu_item_set_submenu(GTK_MENU_ITEM(game),gamemenu);
     gtk_menu_shell_append(GTK_MENU_SHELL(gamemenu),start);
-    gtk_menu_shell_append(GTK_MENU_SHELL(gamemenu),end);
     gtk_menu_shell_append(GTK_MENU_SHELL(gamemenu),quit);
     gtk_menu_shell_append(GTK_MENU_SHELL(menubar),game);
 
     gtk_box_pack_start(GTK_BOX(vbox),menubar,FALSE,FALSE,3);
     //加入開始選項對應的處理函式
     g_signal_connect(G_OBJECT(start), "activate", G_CALLBACK(on_start), NULL);
-    //加入結束選項對應的處理函式
-    g_signal_connect(G_OBJECT(end), "activate", G_CALLBACK(on_end), NULL);
-
+    
     g_signal_connect(G_OBJECT(quit), "activate", G_CALLBACK(gtk_main_quit), NULL);
     gtk_widget_set_app_paintable(window, TRUE);
     gtk_widget_show_all(window);
