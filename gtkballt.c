@@ -157,7 +157,6 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
         case 112:  //'p' 暫停控制
             if(pause)   //暫停取消
             {
-                g_source_remove(timeout_id);
                 timeout_id = g_timeout_add(speed, (GSourceFunc) time_handler, (gpointer) window);
                 pause = FALSE;
             }
@@ -168,7 +167,9 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
             }
             break;
        case 110: //'n' new game
-            on_start();
+            new_game();
+            g_source_remove(timeout_id);
+            timeout_id = g_timeout_add(100, (GSourceFunc) time_handler, (gpointer) window);
             break;
        case 113: //'q' quit game
             gtk_main_quit ();
@@ -177,15 +178,21 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
     }
 }
 
-
-//開始，初始化遊戲
-void on_start()
+void on_start(GtkWidget *widget,gpointer data)
 {
-    g_print ("\n ************\n *  start!  *\n ************\n\n");
+    
     gtk_widget_hide (table);
     gtk_widget_hide (start);
     gtk_widget_hide (quit);
     gtk_widget_hide (title);
+   
+    new_game();
+}
+
+//開始，初始化遊戲
+int new_game()
+{
+   
     for(i=0;i<ballcount;i++)
     {
         ball_x[i] =20;           //球圓心初始x座標
@@ -195,14 +202,19 @@ void on_start()
         x_vec[i] = 10+i;            //球移動x向量
         y_vec[i] = 10+(ballcount-i);            //球移動y向量
     }
-
-    board_x = 0;           //板子左上x座標
-    board_y = 280;         //板子左上y座標
+    
     board_width = 20;      //板子寬度
     board_height = 20;     //板子厚度
+    
+    board_x = 0;                                     //板子左上x座標
+    board_y = windows_height - board_height;         //板子左上y座標
+    
 
+    //將球數和速度回到預設
     speed = 100;
-
+    ballcount = 5;
+    
+    
     game_over = FALSE;
 }
 
@@ -230,17 +242,17 @@ int main(int argc,char **argv)
     //設定視窗寬&高
     gtk_window_set_default_size(GTK_WINDOW(window), windows_weight, windows_height);
 
-     /* 作出標題畫面 */
+   /* 作出標題畫面 */
     table = gtk_table_new (5, 5, TRUE);
     gtk_container_add (GTK_CONTAINER (window), table);
 
-    title = gtk_label_new("BALL GAME");
-    gtk_table_attach_defaults (GTK_TABLE (table), title, 2, 3, 0, 1);
+    title = gtk_label_new("BALL GAME\n',.'to change ballcount\narrowkey to control&change speed\n'N'to newgame 'Q'to quit");
+    gtk_table_attach_defaults (GTK_TABLE (table), title, 1, 4, 0, 1);
     gtk_widget_show (title);
 
     start = gtk_button_new_with_label ("START");
     g_signal_connect (G_OBJECT (start), "clicked",G_CALLBACK (on_start), (gpointer) "start_button");
-    gtk_table_attach_defaults (GTK_TABLE (table), start, 1, 4, 1, 2);
+    gtk_table_attach_defaults (GTK_TABLE (table), start, 1, 4, 2, 3);
     gtk_widget_show (start);
 
     quit = gtk_button_new_with_label ("Quit");
@@ -248,8 +260,8 @@ int main(int argc,char **argv)
     gtk_table_attach_defaults (GTK_TABLE (table), quit, 1, 4, 3, 4);
     gtk_widget_show (quit);
     /* 作出標題畫面 */
+    
     //加入開始選項對應的處理函式
-
     gtk_widget_set_app_paintable(window, TRUE);
     gtk_widget_show_all(window);
     //加入time handler, 100ms
