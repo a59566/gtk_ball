@@ -26,8 +26,6 @@ int board_move = 10;
 gint timeout_id;
 int game_over = TRUE;      //是否結束
 int pause = FALSE;
-int speed_temp; 
-int board_move_temp;
 
 
 //繪製球
@@ -63,10 +61,18 @@ void move_ball()
 {
     for(i=0;i<ballcount;i++)
     {
-        if( ball_x[i] - r[i] <= 0 )        x_vec[i] = -x_vec[i]+(rand()%5-2);//到左邊界
-        if( ball_x[i] + r[i] >= windows_weight )        x_vec[i] = -x_vec[i]+(rand()%5-2);//到右邊界
-        if( ball_y[i] - r[i] <= 20)        y_vec[i] = -y_vec[i]+(rand()%5-2);//到上邊界
-        if( ball_y[i] + r[i] >= windows_height)        y_vec[i] = -y_vec[i]+(rand()%5-2);//到下邊界
+        //到左邊界
+        if( ball_x[i] - r[i] <= 0 )        
+            x_vec[i] = -x_vec[i]+(rand()%5-2);
+        //到右邊界    
+        if( ball_x[i] + r[i] >= windows_weight )   
+            x_vec[i] = -x_vec[i]+(rand()%5-2);
+        //到上邊界    
+        if( ball_y[i] - r[i] <= 20)        
+            y_vec[i] = -y_vec[i]+(rand()%5-2);
+        //到下邊界    
+        if( ball_y[i] + r[i] >= windows_height)        
+            y_vec[i] = -y_vec[i]+(rand()%5-2);
 
         //板子上
         if( (ball_x[i] >= board_x) && (ball_x[i] <= board_x + board_width) )
@@ -136,7 +142,14 @@ void on_key_press(GtkWindow *window, GdkEventKey *eventkey, gpointer data)
             break;
         case 46:   //'.'
             if(ballcount < max_balls)
+            {
+                ball_x[ballcount] =20;           //球圓心初始x座標
+                ball_y[ballcount] =40;           //球圓心初始y座標
+                r[ballcount] =10;               //球半徑
+                x_vec[ballcount] = 10;            //球移動x向量
+                y_vec[ballcount] = 10;            //球移動y向量
                 ballcount++;
+            }
             break;
         case 112:  //'p' 暫停控制
             if(pause)   //暫停取消
